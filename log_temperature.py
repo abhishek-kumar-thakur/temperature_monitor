@@ -40,6 +40,8 @@ import datetime
 
 import Adafruit_DHT
 import gspread
+import requests
+
 from oauth2client.service_account import ServiceAccountCredentials
 
 
@@ -122,7 +124,8 @@ GDOCS_OAUTH_JSON       = '/home/pi/temperature_monitor/google_credentials.json'
 GDOCS_SPREADSHEET_NAME = 'Temperature Monitor'
 
 # How long to wait (in seconds) between measurements.
-FREQUENCY_SECONDS = 600
+#900 because of weather API (I want to be free tier!)
+FREQUENCY_SECONDS = 900
 
 
 def login_open_sheet(oauth_key_file, spreadsheet):
@@ -140,8 +143,10 @@ def login_open_sheet(oauth_key_file, spreadsheet):
 
 
 print('Logging sensor measurements to {0} every {1} seconds.'.format(GDOCS_SPREADSHEET_NAME, FREQUENCY_SECONDS))
+print('Using temperature data from apixu')
 print('Press Ctrl-C to quit.')
 worksheet = None
+current_temp = None
 while True:
     # Login if necessary.
     if worksheet is None:
@@ -149,6 +154,14 @@ while True:
 
     # Attempt to get sensor reading.
     humidity, temp = Adafruit_DHT.read(DHT_TYPE, DHT_PIN)
+
+    #attempt to get current weather from api
+    try:
+        r = requests.get('http://api.apixu.com/v1/current.json?key=6318bdbb003d466dbd141845161009&q=T6G1G9')
+        current_temp = r.json()['current']['temp_c']
+    except:
+        print('Error getting temperature data')
+        current_temp = ''
 
     # Skip to the next reading if a valid measurement couldn't be taken.
     # This might happen if the CPU is under a lot of load and the sensor
@@ -162,7 +175,7 @@ while True:
 
     # Append the data in the spreadsheet, including a timestamp
     try:
-        worksheet.append_row((datetime.datetime.now(), temp, humidity))
+        worksheet.append_row((datetime.datetime.now(), temp, humidity, current_temp))
     except:
         # Error appending data, most likely because credentials are stale.
         # Null out the worksheet so a login is performed at the top of the loop.
@@ -171,6 +184,6 @@ while True:
         time.sleep(FREQUENCY_SECONDS)
         continue
 
-    # Wait 30 seconds before continuing
+    # Wait FREQUENCY_SECONDS seconds before continuing
     print('Wrote a row to {0}'.format(GDOCS_SPREADSHEET_NAME))
     time.sleep(FREQUENCY_SECONDS)
