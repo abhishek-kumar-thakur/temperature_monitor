@@ -44,9 +44,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 
 
-
-
-
+print "Welcome to Temperature Monitor. Data is logged at /tmp/temperature_monitor.log"
 
 
 
@@ -55,7 +53,7 @@ import logging.handlers
 
 # Deafults
 LOG_FILENAME = "/tmp/temperature_monitor.log"
-LOG_LEVEL = logging.WARNING  # Could be e.g. "DEBUG" or "WARNING"
+LOG_LEVEL = logging.INFO  # Could be e.g. "DEBUG" or "WARNING"
 
 
 # Configure logging to log to a file, making a new file at midnight and keeping the last 3 day's data
@@ -118,13 +116,13 @@ DHT_PIN  = 4
 # Then use the File -> Share... command in the spreadsheet to share it with read
 # and write acess to the email address above.  If you don't do this step then the
 # updates to the sheet will fail!
-GDOCS_OAUTH_JSON       = '/home/pi/Adafruit_Python_DHT/examples/google_credentials.json'
+GDOCS_OAUTH_JSON       = '/home/pi/temperature_monitor/google_credentials.json'
 
 # Google Docs spreadsheet name.
 GDOCS_SPREADSHEET_NAME = 'Temperature Monitor'
 
 # How long to wait (in seconds) between measurements.
-FREQUENCY_SECONDS      = 60
+FREQUENCY_SECONDS = 600
 
 
 def login_open_sheet(oauth_key_file, spreadsheet):

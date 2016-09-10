@@ -11,8 +11,8 @@
 
 
 # Change the next 3 lines to suit where you install your script and what you want to call it
-DIR=/home/pi/Adafruit_Python_DHT/examples
-DAEMON=$DIR/google_spreadsheet.py
+DIR=/home/pi/temperature_monitor
+DAEMON=$DIR/log_temperature.py
 DAEMON_NAME=temperature_monitor
 
 # Add any command line options for your daemon here
@@ -28,8 +28,8 @@ PIDFILE=/var/run/$DAEMON_NAME.pid
 . /lib/lsb/init-functions
 
 do_start () {
-    #wait 20 seconds, for the networking stack to hopefully start. I hate linux.
-    sleep 20
+    #wait 15 seconds, for the networking stack to hopefully start. I hate linux.
+    sleep 15
     log_daemon_msg "Starting system $DAEMON_NAME daemon"
     start-stop-daemon --start --background --pidfile $PIDFILE --make-pidfile --user $DAEMON_USER --startas $DAEMON
     log_end_msg $?
